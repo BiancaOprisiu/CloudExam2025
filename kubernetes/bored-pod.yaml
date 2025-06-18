@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bored-pod
+  labels:
+    app: bored
+spec:
+  containers:
+    - name: fetcher
+      image: curlimages/curl
+      command: ["/bin/sh", "-c"]
+      args:
+        - while true; do
+          curl -s https://bored-api.appbrewery.com/random > /plan/data.txt;
+          sleep 10;
+          done
+      volumeMounts:
+        - name: plan-volume
+          mountPath: /plan
+
+    - name: reader
+      image: alpine
+      command: ["/bin/sh", "-c"]
+      args:
+        - while true; do
+          cat /plan/data.txt;
+          sleep 10;
+          done
+      volumeMounts:
+        - name: plan-volume
+          mountPath: /plan
+
+  volumes:
+    - name: plan-volume
+      emptyDir: {}

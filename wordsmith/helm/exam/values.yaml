@@ -1,0 +1,26 @@
+# Default values for exam.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+alice:
+  namespace: monday
+  image:
+    repository: nginx
+    tag: "1.14.2"
+
+mario:
+  namespace: tuesday
+  image:
+    repository: nginx
+    tag: "1.14.2"
+  readinessPort: 80
+
+pea:
+  namespace: wednesday
+  image:
+    repository: excalidraw/excalidraw
+    tag: "latest"
+  resources:
+    memory: "256Mi"

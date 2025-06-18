@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alice-{{ include "exam.fullname" . }}
+  namespace: {{ .Values.alice.namespace }}
+  labels:
+    {{- include "exam.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "exam.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "exam.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      containers:
+        - name: alice-{{ .Release.Name }}
+          image: "{{ .Values.alice.image.repository }}:{{ .Values.alice.image.tag | default .Chart.AppVersion }}"
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: html-volume
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: html-volume
+          configMap:
+            name: alice-configmap
+            items:
+              - key: index.html
+                path: index.html
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mario-{{ include "exam.fullname" . }}
+  namespace: {{ .Values.mario.namespace }}
+  labels:
+    {{- include "exam.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "exam.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "exam.labels" . | nindent 8 }}
+          {{- with .Values.podLabels }}
+          {{- toYaml . | nindent 8 }}
+          {{- end }}
+    spec:
+      containers:
+        - name: mario-{{ .Release.Name }}
+          image: "{{ .Values.mario.image.repository }}:{{ .Values.mario.image.tag | default .Chart.AppVersion }}"
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.mario.readinessPort }}
+          volumeMounts:
+            - name: html-volume
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: html-volume
+          configMap:
+            name: mario-configmap
+            items:
+              - key: index.html
+                path: index.html
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pea-{{ include "exam.fullname" . }}
+  namespace: {{ .Values.pea.namespace }}
+  labels:
+    {{- include "exam.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "exam.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "exam.labels" . | nindent 8 }}
+          {{- with .Values.podLabels }}
+          {{- toYaml . | nindent 8 }}
+          {{- end }}
+    spec:
+      containers:
+        - name: pea-{{ .Release.Name }}
+          image: "{{ .Values.pea.image.repository }}:{{ .Values.pea.image.tag | default .Chart.AppVersion }}"
+          ports:
+            - containerPort: 80
+          resources:
+           requests:
+              memory: {{ .Values.pea.resources.memory }}
+           limits:
+              memory: {{ .Values.pea.resources.memory }}

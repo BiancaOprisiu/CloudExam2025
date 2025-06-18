@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alice-configmap
+  namespace: {{ .Values.alice.namespace }}
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>My Custom Page</title>
+    </head>
+    <body>
+      <h1>Well done {{ .Release.Name }}! You fixed the alice pod</h1>
+    </body>
+    </html>
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mario-configmap
+  namespace: {{ .Values.mario.namespace }}
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>My Custom Page</title>
+    </head>
+    <body>
+      <h1>Well done {{ .Release.Name }}! You fixed the mario pod</h1>
+    </body>
+    </html>
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-schema
+  namespace: {{ .Release.Namespace }}
+data:
+  {{- (.Files.Glob "db-config/*").AsConfig | nindent 2 }}
